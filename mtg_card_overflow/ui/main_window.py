@@ -14,20 +14,68 @@ def run_gui(config):
     window = tk.Tk()
     window.title("MTG-CardOverflow")
 
-    # Hintergrundbild laden und Fenstergröße anpassen
+    # Hintergrundbild laden und Fenstergröße setzen
     bg_path = os.path.join(os.path.dirname(__file__), "background.jpg")
     if os.path.exists(bg_path):
         bg_img = Image.open(bg_path)
         width, height = bg_img.size
-        window.geometry(f"{width}x{height}")
-        window.resizable(False, False)
-        bg_photo = ImageTk.PhotoImage(bg_img)
     else:
-        width, height = 600, 800
-        window.geometry("600x800")
+        width, height = 800, 1200  # Fallback-Größe
+
+    window.geometry(f"{width}x{height}")
+    window.resizable(False, False)
+
+    # Modernes Button-Design mit ttk.Style
+    style = ttk.Style(window)
+    style.theme_use('clam')
+    style.configure(
+        "Modern.TButton",
+        font=("Segoe UI", 20, "bold"),  # Hauptbutton: größere Schrift
+        foreground="#ffffff",
+        background="#444444",
+        borderwidth=0,
+        focusthickness=3,
+        focuscolor="#888888",
+        padding=16
+    )
+    style.configure(
+        "Small.TButton",
+        font=("Segoe UI", 13),  # Kleine Buttons: mittlere Schrift
+        foreground="#ffffff",
+        background="#444444",
+        borderwidth=0,
+        focusthickness=2,
+        focuscolor="#888888",
+        padding=8
+    )
+    style.map(
+        "Modern.TButton",
+        background=[("active", "#666666"), ("pressed", "#222222")]
+    )
+    style.map(
+        "Small.TButton",
+        background=[("active", "#666666"), ("pressed", "#222222")]
+    )
+
+    # Tabs anlegen
+    notebook = ttk.Notebook(window)
+    main_frame = tk.Frame(notebook, width=width, height=height)
+    history_frame = tk.Frame(notebook, width=width, height=height)
+    notebook.add(main_frame, text="Start")
+    notebook.add(history_frame, text="History")
+    notebook.pack(fill="both", expand=True)
+
+    # Hintergrundbild auf beide Tabs anwenden
+    if os.path.exists(bg_path):
+        bg_img = bg_img.resize((width, height), Image.LANCZOS)
+        bg_photo = ImageTk.PhotoImage(bg_img)
+        for frame in (main_frame, history_frame):
+            bg_label = tk.Label(frame, image=bg_photo, borderwidth=0, highlightthickness=0)
+            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+            bg_label.lower()
+            bg_label.image = bg_photo
+    else:
         window.configure(bg="black")
-        window.resizable(False, False)
-        bg_photo = None
 
     icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'mtg_card_printer_icon.ico'))
     if os.path.exists(icon_path):
@@ -36,37 +84,30 @@ def run_gui(config):
         except Exception as e:
             print(f"Icon konnte nicht gesetzt werden: {e}")
 
-    # Tabs anlegen
-    notebook = ttk.Notebook(window)
-    main_frame = tk.Frame(notebook, width=width, height=height)
-    history_frame = tk.Frame(notebook, width=width, height=height)
-    notebook.add(main_frame, text="Start")
-    notebook.add(history_frame, text="History")
-    notebook.place(x=0, y=0, relwidth=1, relheight=1)
+    # --- Haupttab: Buttons platzieren ---
+    # Hauptbutton (PNG zu PDF) groß und zentriert
+    main_btn_width = int(width * 0.5)
+    main_btn_height = 70
+    main_btn_x = int((width - main_btn_width) / 2)
+    main_btn_y = int(height * 0.22)
 
-    # Hintergrundbild auf beide Tabs anwenden
-    if bg_photo:
-        for frame in (main_frame, history_frame):
-            bg_label = tk.Label(frame, image=bg_photo)
-            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-            bg_label.image = bg_photo  # Referenz halten
-
-    # --- Haupttab: Buttons relativ zur Bildgröße platzieren ---
-    btn_width = int(width * 0.33)
-    btn_height = 40
-    x_pos = int(width * 0.33)
-    y_start = int(height * 0.07)
-    y_gap = 60
+    # Kleine Buttons nebeneinander darunter
+    small_btn_width = int(width * 0.22)
+    small_btn_height = 38
+    spacing = int(width * 0.04)
+    small_btn_y = main_btn_y + main_btn_height + 40
+    left_btn_x = int((width - (2 * small_btn_width + spacing)) / 2)
+    right_btn_x = left_btn_x + small_btn_width + spacing
 
     def change_input_dir():
-        new_dir = filedialog.askdirectory(title="Input-Ordner wählen")
+        new_dir = filedialog.askdirectory(title="Input-Ordner")
         if new_dir:
             config["input_dir"] = new_dir
             save_config(config)
             messagebox.showinfo("Info", f"Input-Ordner geändert zu:\n{new_dir}")
 
     def change_output_dir():
-        new_dir = filedialog.askdirectory(title="Output-Ordner wählen")
+        new_dir = filedialog.askdirectory(title="Output-Ordner")
         if new_dir:
             config["output_dir"] = new_dir
             save_config(config)
@@ -95,9 +136,28 @@ def run_gui(config):
             tracking.mark_as_processed(file)
         messagebox.showinfo("Fertig", f"{len(to_process)} Karten verarbeitet.")
 
-    tk.Button(main_frame, text="Input-Ordner ändern", command=change_input_dir).place(x=x_pos, y=y_start, width=btn_width, height=btn_height)
-    tk.Button(main_frame, text="Output-Ordner ändern", command=change_output_dir).place(x=x_pos, y=y_start + y_gap, width=btn_width, height=btn_height)
-    tk.Button(main_frame, text="PNG zu PDF", command=select_and_generate).place(x=x_pos, y=y_start + 2 * y_gap, width=btn_width, height=btn_height)
+    # Hauptbutton
+    ttk.Button(
+        main_frame,
+        text="PNG zu PDF",
+        style="Modern.TButton",
+        command=select_and_generate
+    ).place(x=main_btn_x, y=main_btn_y, width=main_btn_width, height=main_btn_height)
+
+    # Kleine Buttons nebeneinander
+    ttk.Button(
+        main_frame,
+        text="Input-Ordner",
+        style="Small.TButton",
+        command=change_input_dir
+    ).place(x=left_btn_x, y=small_btn_y, width=small_btn_width, height=small_btn_height)
+
+    ttk.Button(
+        main_frame,
+        text="Output-Ordner",
+        style="Small.TButton",
+        command=change_output_dir
+    ).place(x=right_btn_x, y=small_btn_y, width=small_btn_width, height=small_btn_height)
 
     # --- History-Tab: Zeige die letzten 10 PDFs als anklickbare Buttons ---
     def open_pdf(pdf_path):
@@ -119,9 +179,12 @@ def run_gui(config):
         for widget in history_frame.winfo_children():
             widget.destroy()
         # Hintergrundbild erneut setzen (sonst verschwindet es beim Tab-Wechsel)
-        if bg_photo:
-            bg_label = tk.Label(history_frame, image=bg_photo)
+        if os.path.exists(bg_path):
+            bg_img = Image.open(bg_path).resize((width, height), Image.LANCZOS)
+            bg_photo = ImageTk.PhotoImage(bg_img)
+            bg_label = tk.Label(history_frame, image=bg_photo, borderwidth=0, highlightthickness=0)
             bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+            bg_label.lower()
             bg_label.image = bg_photo
         last_pdfs = get_last_pdfs(output_dir)
         if not last_pdfs:
@@ -130,16 +193,12 @@ def run_gui(config):
         tk.Label(history_frame, text="Deine letzten 10 erstellte PDFs:", bg="#000000", fg="white", font=("Arial", 14, "bold")).pack(pady=10)
         for idx, pdf_path in enumerate(last_pdfs):
             fname = os.path.basename(pdf_path)
-            btn = tk.Button(
+            ttk.Button(
                 history_frame,
                 text=f"{idx+1}. {fname}",
-                bg="#222222",
-                fg="white",
-                font=("Arial", 12),
-                relief=tk.RAISED,
+                style="Modern.TButton",
                 command=lambda p=pdf_path: open_pdf(p)
-            )
-            btn.pack(anchor="w", padx=30, pady=4)
+            ).pack(anchor="w", padx=30, pady=4)
 
     notebook.bind("<<NotebookTabChanged>>", lambda e: show_history() if notebook.index("current") == 1 else None)
 
