@@ -2,6 +2,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from PIL import Image
 import os
+import datetime
 
 OUTPUT_DIR = "history"
 CARD_WIDTH_MM = 63
@@ -46,7 +47,9 @@ def generate_pdf(image_paths, output_dir=OUTPUT_DIR):
     card_height_px = int(CARD_HEIGHT_MM / 25.4 * DPI)
 
     for idx, page_images in enumerate(pages):
-        pdf_path = os.path.join(output_dir, f"mtg_cards_page_{idx+1}.pdf")
+        # Erzeuge für jede Seite eine eigene PDF mit Zeitstempel und Seitennummer
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        pdf_path = os.path.join(output_dir, f"mtg_cards_{timestamp}_page{idx+1}.pdf")
         c = canvas.Canvas(pdf_path, pagesize=A4)
 
         for i, img_path in enumerate(page_images):
