@@ -1,26 +1,24 @@
-import os
 import json
+import os
 
-TRACKING_FILE = "processed_files.json"
+TRACKING_PATH = "processed_files.json"
 
-def load_tracking():
-    if not os.path.exists(TRACKING_FILE):
-        return set()
-    with open(TRACKING_FILE, "r") as f:
-        try:
-            return set(json.load(f))
-        except json.JSONDecodeError:
-            return set()
+def load_processed():
+    if not os.path.exists(TRACKING_PATH):
+        return []
+    with open(TRACKING_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-def save_tracking(processed):
-    with open(TRACKING_FILE, "w") as f:
-        json.dump(list(processed), f)
+def save_processed(processed_list):
+    with open(TRACKING_PATH, "w", encoding="utf-8") as f:
+        json.dump(processed_list, f, indent=2)
+
+def mark_as_processed(filename):
+    processed = load_processed()
+    if filename not in processed:
+        processed.append(filename)
+        save_processed(processed)
 
 def is_processed(filename):
-    processed = load_tracking()
+    processed = load_processed()
     return filename in processed
-
-def mark_as_processed(filenames):
-    processed = load_tracking()
-    processed.update(filenames)
-    save_tracking(processed)
