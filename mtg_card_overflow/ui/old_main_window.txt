@@ -8,16 +8,17 @@ from mtg_card_overflow.logic import tracking, history
 from mtg_card_overflow.logic.pdf_generator import generate_pdf
 from mtg_card_overflow.logic.config import load_config, save_config
 from mtg_card_overflow.logic.history import get_last_pdfs
+from mtg_card_overflow.logic.directprint import print_pdf  # <--- Importiere das Print-Modul
 
 
 def run_gui(config):
     window = tk.Tk()
     window.title("MTG-CardOverflow")
 
-    # Hintergrundbild laden und Fenstergröße setzen
-    bg_path = os.path.join(os.path.dirname(__file__), "background.jpg")
+    # Hintergrundbild laden und Fenstergröße setzen (PNG statt JPG)
+    bg_path = os.path.join(os.path.dirname(__file__), "background.png")
     if os.path.exists(bg_path):
-        bg_img = Image.open(bg_path)
+        bg_img = Image.open(bg_path).convert("RGBA")
         width, height = bg_img.size
     else:
         width, height = 800, 1200  # Fallback-Größe
@@ -48,6 +49,12 @@ def run_gui(config):
         focuscolor="#888888",
         padding=8
     )
+    style.configure(
+        "Print.TCheckbutton",
+        font=("Segoe UI", 14),
+        foreground="#ffffff",
+        background="#444444"
+    )
     style.map(
         "Modern.TButton",
         background=[("active", "#666666"), ("pressed", "#222222")]
@@ -65,7 +72,7 @@ def run_gui(config):
     notebook.add(history_frame, text="History")
     notebook.pack(fill="both", expand=True)
 
-    # Hintergrundbild auf beide Tabs anwenden
+    # Hintergrundbild auf beide Tabs anwenden (PNG)
     if os.path.exists(bg_path):
         bg_img = bg_img.resize((width, height), Image.LANCZOS)
         bg_photo = ImageTk.PhotoImage(bg_img)
@@ -84,20 +91,46 @@ def run_gui(config):
         except Exception as e:
             print(f"Icon konnte nicht gesetzt werden: {e}")
 
-    # --- Haupttab: Buttons platzieren ---
-    # Hauptbutton (PNG zu PDF) groß und zentriert
-    main_btn_width = int(width * 0.5)
-    main_btn_height = 70
-    main_btn_x = int((width - main_btn_width) / 2)
-    main_btn_y = int(height * 0.22)
+    # --- Haupttab: Buttons dynamisch platzieren ---
+    # Kontrollkästchen für Direktdruck (echtes Kästchen, kein Button-Style)
+    print_var = tk.BooleanVar(value=False)
 
-    # Kleine Buttons nebeneinander darunter
-    small_btn_width = int(width * 0.22)
-    small_btn_height = 38
-    spacing = int(width * 0.04)
-    small_btn_y = main_btn_y + main_btn_height + 40
-    left_btn_x = int((width - (2 * small_btn_width + spacing)) / 2)
-    right_btn_x = left_btn_x + small_btn_width + spacing
+    # Button-Container für zentrierte Anordnung
+    btn_frame = tk.Frame(main_frame, bg="#444444", width=width)
+    btn_frame.place(relx=0.5, rely=0.25, anchor="n")  # zentriert oben
+
+    # Hauptbutton (PNG zu PDF)
+    ttk.Button(
+        btn_frame,
+        text="PNG zu PDF",
+        style="Modern.TButton",
+        command=lambda: select_and_generate()
+    ).pack(pady=(0, 30), ipadx=30, ipady=10)
+
+    # Kleine Buttons nebeneinander
+    small_btns = tk.Frame(btn_frame, bg="")
+    small_btns.pack()
+    ttk.Button(
+        small_btns,
+        text="Input-Ordner",
+        style="Small.TButton",
+        command=lambda: change_input_dir()
+    ).pack(side="left", padx=10, ipadx=10, ipady=5)
+    ttk.Button(
+        small_btns,
+        text="Output-Ordner",
+        style="Small.TButton",
+        command=lambda: change_output_dir()
+    ).pack(side="left", padx=10, ipadx=10, ipady=5)
+
+    # Kontrollkästchen darunter
+    chk_print = ttk.Checkbutton(
+        btn_frame,
+        text="PDF nach Erstellung direkt drucken",
+        variable=print_var,
+        style="Print.TCheckbutton"
+    )
+    chk_print.pack(pady=(30, 0))
 
     def change_input_dir():
         new_dir = filedialog.askdirectory(title="Input-Ordner")
@@ -131,33 +164,24 @@ def run_gui(config):
             messagebox.showinfo("Keine neuen Karten", "Alle Karten wurden bereits verarbeitet.")
             return
 
-        generate_pdf(to_process, output_dir=config.get("output_dir", "history"))
+        output_dir = config.get("output_dir", "history")
+        os.makedirs(output_dir, exist_ok=True)
+        # Vorherige PDFs merken
+        existing_pdfs = set(os.listdir(output_dir))
+        generate_pdf(to_process, output_dir=output_dir)
+        # Neue PDFs finden
+        new_pdfs = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.lower().endswith(".pdf") and f not in existing_pdfs]
         for file in to_process:
             tracking.mark_as_processed(file)
         messagebox.showinfo("Fertig", f"{len(to_process)} Karten verarbeitet.")
 
-    # Hauptbutton
-    ttk.Button(
-        main_frame,
-        text="PNG zu PDF",
-        style="Modern.TButton",
-        command=select_and_generate
-    ).place(x=main_btn_x, y=main_btn_y, width=main_btn_width, height=main_btn_height)
-
-    # Kleine Buttons nebeneinander
-    ttk.Button(
-        main_frame,
-        text="Input-Ordner",
-        style="Small.TButton",
-        command=change_input_dir
-    ).place(x=left_btn_x, y=small_btn_y, width=small_btn_width, height=small_btn_height)
-
-    ttk.Button(
-        main_frame,
-        text="Output-Ordner",
-        style="Small.TButton",
-        command=change_output_dir
-    ).place(x=right_btn_x, y=small_btn_y, width=small_btn_width, height=small_btn_height)
+        # Wenn Haken gesetzt, alle neuen PDFs drucken
+        if print_var.get() and new_pdfs:
+            for pdf in new_pdfs:
+                try:
+                    print_pdf(pdf)
+                except Exception as e:
+                    messagebox.showerror("Fehler", f"PDF konnte nicht gedruckt werden:\n{e}")
 
     # --- History-Tab: Zeige die letzten 10 PDFs als anklickbare Buttons ---
     def open_pdf(pdf_path):
@@ -180,7 +204,7 @@ def run_gui(config):
             widget.destroy()
         # Hintergrundbild erneut setzen (sonst verschwindet es beim Tab-Wechsel)
         if os.path.exists(bg_path):
-            bg_img = Image.open(bg_path).resize((width, height), Image.LANCZOS)
+            bg_img = Image.open(bg_path).convert("RGBA").resize((width, height), Image.LANCZOS)
             bg_photo = ImageTk.PhotoImage(bg_img)
             bg_label = tk.Label(history_frame, image=bg_photo, borderwidth=0, highlightthickness=0)
             bg_label.place(x=0, y=0, relwidth=1, relheight=1)

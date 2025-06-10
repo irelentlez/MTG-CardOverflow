@@ -1,7 +1,7 @@
 import os
 from mtg_card_overflow.logic.config import load_config
-from mtg_card_overflow.ui.main_window import run_gui
-
+#from mtg_card_overflow.ui.main_window import run_gui
+from mtg_card_overflow.ui.main_window_qt import run_gui
 if __name__ == "__main__":
     config = load_config()
     output_dir = config.get("output_dir") or "history"
