@@ -24,3 +24,48 @@ Das Programm platziert bis zu 9 Karten pro Seite, fügt Schneidelinien für einf
    pyn main.py
 3. Passe Input- und Output-Ordner bei Bedarf in der GUI an.
 4. Klicke auf PNG zu PDF, um die PDFs zu erstellen.
+
+
+Installation der Requirements
+1. Stelle sicher, dass Python 3.8 oder neuer installiert ist
+Windows:
+Öffne die Eingabeaufforderung (cmd) oder PowerShell.
+
+Linux:
+Öffne ein Terminal.
+
+2. Installation der Abhängigkeiten mit pip
+Windows
+Standardbefehl:
+
+sh
+pip install -r requirements.txt
+Fallback, wenn pip nicht gefunden wird:
+
+sh
+python -m pip install -r requirements.txt
+oder
+
+sh
+py -m pip install -r requirements.txt
+Linux
+Standardbefehl:
+
+sh
+pip3 install -r requirements.txt
+Fallback, wenn pip3 nicht gefunden wird:
+
+sh
+python3 -m pip install -r requirements.txt
+3. Hinweise
+Sollte keine requirements.txt vorhanden sein, kannst du die Pakete auch einzeln installieren:
+sh
+pip install reportlab Pillow PyQt5
+Bei Problemen mit Berechtigungen unter Linux ggf. sudo verwenden:
+sh
+sudo pip3 install -r requirements.txt
+Prüfe nach der Installation, ob die Pakete korrekt installiert wurden:
+sh
+pip show reportlab Pillow PyQt5
+Tipp:
+Verwende nach Möglichkeit eine virtuelle Umgebung (python -m venv venv), um Paketkonflikte zu vermeiden.
