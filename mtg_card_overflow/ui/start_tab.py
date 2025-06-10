@@ -14,7 +14,7 @@ def init_start_tab(self):
 
         # Hauptbutton
         btn_main = QPushButton("PDF erstellen")
-        btn_main.setFont(QFont("Segoe UI", 20, QFont.Bold))
+        btn_main.setFont(QFont("Segoe UI", 12, QFont.Bold))
         btn_main.setStyleSheet(
             "QPushButton { color: white; background: transparent; border-radius: 12px; padding: 18px; }"
             "QPushButton:hover { background: #666666; }"
@@ -27,14 +27,12 @@ def init_start_tab(self):
         # Kleine Buttons nebeneinander
         btn_row = QHBoxLayout()
         btn_input = QPushButton("Input-Ordner")
-        btn_input.setFont(QFont("Segoe UI", 13))
         btn_input.setStyleSheet(
             "QPushButton { color: white; background: transparent; border-radius: 8px; padding: 10px; }"
             "QPushButton:hover { background: #666666; }"
         )
         btn_input.clicked.connect(lambda: change_input_dir(self))  # <--- geändert
         btn_output = QPushButton("Output-Ordner")
-        btn_output.setFont(QFont("Segoe UI", 13))
         btn_output.setStyleSheet(
             "QPushButton { color: white; background: transparent; border-radius: 8px; padding: 10px; }"
             "QPushButton:hover { background: #666666; }"
@@ -48,7 +46,6 @@ def init_start_tab(self):
 
         # Kontrollkästchen
         self.print_checkbox = QCheckBox("PDF nach Erstellung direkt drucken")
-        self.print_checkbox.setFont(QFont("Segoe UI", 14))
         self.print_checkbox.setStyleSheet(
             "QCheckBox { color: white; background: transparent; }"
             "QCheckBox::indicator { width: 22px; height: 22px; }"

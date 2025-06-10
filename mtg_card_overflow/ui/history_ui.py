@@ -39,7 +39,7 @@ def show_history(self):
         label.setStyleSheet("color: white; font-size: 16px;")
         self.history_layout.addWidget(label)
         return
-    label = QLabel("Deine letzten 10 erstellte PDFs:")
+    label = QLabel("Deine letzten 10 erstellten PDFs:")
     label.setStyleSheet("color: white; background: transparent; font-size: 16px; font-weight: bold;")
     self.history_layout.addWidget(label)
     for idx, pdf_path in enumerate(last_pdfs):
@@ -50,7 +50,7 @@ def show_history(self):
         row_layout.setSpacing(10)
 
         btn = QPushButton(f"{idx+1}. {fname}")
-        btn.setFont(QFont("Segoe UI", 13, QFont.Bold))
+        btn.setFont(QFont("Segoe UI", 12, QFont.Bold))
         btn.setStyleSheet(
             "QPushButton { color: white; background: transparent; border-radius: 8px; padding: 10px; }"
             "QPushButton:hover { background: #666666; }"
