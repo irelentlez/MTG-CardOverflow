@@ -17,7 +17,9 @@ from mtg_card_overflow.logic.directprint import print_pdf
 from mtg_card_overflow.ui.history_ui import show_history, open_pdf
 from mtg_card_overflow.ui.dialogs import change_input_dir, change_output_dir
 from mtg_card_overflow.ui.pdf_ui import select_and_generate
+from mtg_card_overflow.ui.settings_tab import init_settings_tab
 from mtg_card_overflow.ui.start_tab import init_start_tab
+# from mtg_card_overflow.ui.settings_tab import init_settings_tab
 
 class MainWindow(QMainWindow):
     def __init__(self, config):
@@ -67,7 +69,16 @@ class MainWindow(QMainWindow):
 
         self.tabs.currentChanged.connect(self.on_tab_changed)
 
- 
+         # Settings-Tab
+        self.settings_tab = QWidget()
+        if os.path.exists(bg_path):
+            self.settings_tab.setStyleSheet(
+                f"QWidget {{ background-image: url('{bg_path.replace(os.sep, '/')}'); background-repeat: no-repeat; background-position: center; }}"
+            )
+        else:
+            self.settings_tab.setStyleSheet("QWidget { background: #222; }")
+        self.tabs.addTab(self.settings_tab, "Settings")
+        init_settings_tab(self)  # <--- Diese Zeile ergänzen!
 
     def init_history_tab(self):
         self.history_layout = QVBoxLayout()
@@ -80,6 +91,8 @@ class MainWindow(QMainWindow):
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.history_scroll)
         self.history_tab.setLayout(main_layout)
+
+        
  
 
     def on_tab_changed(self, idx):
