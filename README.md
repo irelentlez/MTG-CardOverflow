@@ -14,7 +14,8 @@ Das Programm platziert bis zu 9 Karten pro Seite, fügt Schneidelinien für einf
 ## Voraussetzungen
 
 - Python 3.8+
-- Abhängigkeiten: `reportlab`, `Pillow`, `tkinter`
+- Abhängigkeiten: `reportlab`, `Pillow`, `PyQt5`
+- 
 
 ## Schnellstart
 
