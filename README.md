@@ -1,6 +1,6 @@
 # MTG-CardOverflow
 
-Mit  **MTG-CardOverflow** kannst du Magic: The Gathering Kartenbilder (PNG/JPG) automatisch zu druckfertigen PDF-Seiten im A4-Format zusammenstellen.  
+Mit **MTG-CardOverflow** kannst du Magic: The Gathering Kartenbilder (PNG/JPG) automatisch zu druckfertigen PDF-Seiten im A4-Format zusammenstellen.  
 Das Programm platziert bis zu 9 Karten pro Seite, fügt Schneidelinien für einfaches Ausschneiden hinzu und verwaltet bereits verarbeitete Karten.
 
 ## Features
@@ -15,57 +15,81 @@ Das Programm platziert bis zu 9 Karten pro Seite, fügt Schneidelinien für einf
 
 - Python 3.8+
 - Abhängigkeiten: `reportlab`, `Pillow`, `PyQt5`
-- 
 
 ## Schnellstart
 
 1. Lege deine Kartenbilder im Input-Ordner ab (siehe `config.json`).
 2. Starte das Programm mit  
-   pyn main.py
+   ```bash
+   python main.py
+   ```
 3. Passe Input- und Output-Ordner bei Bedarf in der GUI an.
-4. Klicke auf PNG zu PDF, um die PDFs zu erstellen.
+4. Klicke auf **PNG zu PDF**, um die PDFs zu erstellen.
 
+---
 
-Installation der Requirements
-1. Stelle sicher, dass Python 3.8 oder neuer installiert ist
-Windows:
+## Installation der Requirements
+
+### 1. Stelle sicher, dass Python 3.8 oder neuer installiert ist
+
+**Windows:**  
 Öffne die Eingabeaufforderung (cmd) oder PowerShell.
 
-Linux:
+**Linux:**  
 Öffne ein Terminal.
 
-2. Installation der Abhängigkeiten mit pip
-Windows
-Standardbefehl:
+### 2. Installation der Abhängigkeiten mit pip
 
-sh
+#### Windows
+
+Standardbefehl:
+```bash
 pip install -r requirements.txt
+```
+
 Fallback, wenn pip nicht gefunden wird:
-
-sh
+```bash
 python -m pip install -r requirements.txt
+```
 oder
-
-sh
+```bash
 py -m pip install -r requirements.txt
-Linux
+```
+
+#### Linux
+
 Standardbefehl:
-
-sh
+```bash
 pip3 install -r requirements.txt
-Fallback, wenn pip3 nicht gefunden wird:
+```
 
-sh
+Fallback, wenn pip3 nicht gefunden wird:
+```bash
 python3 -m pip install -r requirements.txt
-3. Hinweise
-Sollte keine requirements.txt vorhanden sein, kannst du die Pakete auch einzeln installieren:
-sh
+```
+
+---
+
+### 3. Hinweise
+
+Sollte keine `requirements.txt` vorhanden sein, kannst du die Pakete auch einzeln installieren:
+```bash
 pip install reportlab Pillow PyQt5
-Bei Problemen mit Berechtigungen unter Linux ggf. sudo verwenden:
-sh
+```
+
+Bei Problemen mit Berechtigungen unter Linux ggf. `sudo` verwenden:
+```bash
 sudo pip3 install -r requirements.txt
+```
+
 Prüfe nach der Installation, ob die Pakete korrekt installiert wurden:
-sh
+```bash
 pip show reportlab Pillow PyQt5
-Tipp:
-Verwende nach Möglichkeit eine virtuelle Umgebung (python -m venv venv), um Paketkonflikte zu vermeiden.
+```
+
+**Tipp:**  
+Verwende nach Möglichkeit eine virtuelle Umgebung:
+```bash
+python -m venv venv
+```
+um Paketkonflikte zu vermeiden.
