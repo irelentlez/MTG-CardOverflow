@@ -13,7 +13,7 @@ def init_start_tab(self):
         layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
         # Hauptbutton
-        btn_main = QPushButton("PNG zu PDF")
+        btn_main = QPushButton("PDF erstellen")
         btn_main.setFont(QFont("Segoe UI", 20, QFont.Bold))
         btn_main.setStyleSheet(
             "QPushButton { color: white; background: transparent; border-radius: 12px; padding: 18px; }"
